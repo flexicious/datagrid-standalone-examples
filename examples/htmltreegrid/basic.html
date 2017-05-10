@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<!--PLEASE ENSURE YOU READ THE ACCOMPANYING README.TXT FOR DETAILS-->
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>HTMLTreeGrid Example</title>
+  <link rel="stylesheet" href="css/flexicious.css" type="text/css" />
+</head>
+<body>
+  <div id="app" style="width:800px;height:400px"></div>
+  <script src="../../lib/htmltreegrid.js"></script>
+  <script src="../../data.js"></script>
+  <script type="text/babel">
+      //This can be either an XML string or JS object.
+      const gridConfig = {
+          width: "100%", editable: true, dataProvider: companylist,
+          level: {
+              columns: [
+                  { dataField: "label" },
+                  { dataField: "state" },
+                  { dataField: "rank", sortNumeric: true }]
+          }
+      };
+
+      class View {
+          render(domElement) {
+              this.grid = new flexiciousNmsp.FlexDataGrid(domElement, {
+                  configuration: gridConfig
+              });
+          }
+      }
+      new View().render(document.getElementById("app"));
+  </script>
+</body>
+
+</html>
