@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<!--PLEASE ENSURE YOU READ THE ACCOMPANYING README.TXT FOR DETAILS-->
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>React DataGrid Example</title>
+</head>
+
+<body>
+  <div id="app"></div>
+  <script src="../../lib/reactdatagrid.js"></script>
+  <script src="../../data.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+  <script type="text/babel">
+
+const groupBy=function (dp, prop){
+
+    var buckets = {};
+    var key;
+    var result =[];
+    var _dataProvider= new Object();
+    var _flat= dp;
+    //iterate through the flat list and create a hierarchy
+    for(var i=0;i<_flat.length;i++){
+        var item=_flat[i];
+        key = flexiciousNmsp.UIUtils.resolveExpression(item,prop); //the parent
+        if(!buckets[key]){
+            buckets[key] = [];//the children
+        }
+        buckets[key].push(item); //add to the parents child list
+    }
+    for (key  in buckets){
+        result.push({name:key,label:key,children:buckets[key]}); //create the final structure
+    }
+    return result; //this will refresh the grid...
+}
+const groupedData = groupBy(moves, "createdBy");
+const {
+    ReactDataGrid,
+    ReactDataGridColumnLevel,
+    ReactDataGridColumn,
+    TriStateCheckBox,
+    UIComponent} = flexiciousNmsp;
+
+
+class ColumnHeader extends TriStateCheckBox {
+    clickHandler(event: any) {
+        super.clickHandler(event);
+
+        const grid = this.parent.level.grid;
+
+        grid.getColumnLevel().selectAll(this.getSelected());
+    }
+}
+class MyCheckBox extends TriStateCheckBox {
+        setSelectedState(val) {
+            super.setSelectedState(val);
+            const nestDepth = this.parent.level.getNestDepth();
+            this.setStyleAttribute("display", nestDepth==1?"none":"")
+            if(nestDepth ==1){
+                this.setText("Some new val")
+            }
+        }
+}
+ const CellContainer = ({ children, width, height }: ContainerProps) => (
+  <div  style={{ width, height }}>
+    {children}
+  </div>
+);
+
+ const ConflictCell = ({ cell, row }: any) => {
+  const { conflict_type: type }: Move = row.getData();
+
+  if (!type) {
+    return null;
+  }
+
+  return (
+    <CellContainer height={cell.height} width={cell.width}>
+      <span >type</span>
+    </CellContainer>
+  );
+};
+
+ const DateCell = ({ cell, row }: any) => {
+  const { moveDateString: date }: Move = row.getData();
+
+  if (!date) {
+    return null;
+  }
+
+  return (
+    <CellContainer height={cell.height} width={cell.width}>
+      <p >{moment(date).format('DD/MM/YY')}</p>
+      <span >{moment(date).format('HH:mma')}</span>
+    </CellContainer>
+  );
+};
+
+ const EmployeeCell = ({ cell, row }: any) => {
+  const {
+    employee_firstName: firstName,
+    employee_lastName: lastName,
+    employee_title: role,
+  }: Move = row.getData();
+
+  if (!firstName && !lastName) {
+    return null;
+  }
+
+  return (
+    <CellContainer height={cell.height} width={cell.width}>
+      <p >{firstName} {lastName}</p>
+      <span >{role}</span>
+    </CellContainer>
+  );
+};
+
+ const CommentCell = ({ cell, row }: any) => {
+  const { description }: Move = row.getData();
+
+  // Add non breaking space to prevent column collapse
+  const nonBreakSpace = '\u00A0';
+
+  return (
+    <CellContainer height={cell.height} width={cell.width}>
+      <p >{description || nonBreakSpace}</p>
+    </CellContainer>
+  );
+};
+
+ const LocationCell = ({ cell, row, column }: any) => {
+  const move: Move = row.getData();
+  const type = column.dataField;
+
+  if (!move[`${type}SeatLabel`]) {
+    return null;
+  }
+
+  return (
+    <CellContainer height={cell.height} width={cell.width}>
+      <p >{move[`${type}SeatLabel`]}</p>
+      <span >{move[`${type}SeatFloor`]}</span>
+    </CellContainer>
+  );
+};
+
+class Example extends React.Component {
+
+    constructor(props: Props) {
+        super(props);
+
+    }
+    
+    componentDidMount(){
+        this.dataGrid.setDataProvider(groupedData);
+
+    }
+    render() {
+
+
+        return (
+            <div >
+                
+                <ReactDataGrid
+                    dataProvider={moves}
+                    enableActiveCellHighlight={false}
+                    enableDefaultDisclosureIcon={false}
+                    enableDrag
+                    enableDynamicLevels
+                    enableLockedSectionSeparators={false}
+                    horizontalScrollPolicy="auto"
+                    lockedSeperatorThickness={0}
+                    verticalGridLines={false}
+                    enableFilters
+                    rowHeight={40}
+                    preferencePersistenceKey="dynamicGrouping"
+                    ref={(grid) => { this.dataGrid = grid; } }
+                    variableRowHeight
+                    width="100%"
+                    >
+                    <ReactDataGridColumnLevel childrenField="children" enableExpandCollapse>
+                        <ReactDataGridColumn
+                            type="checkbox"
+                            itemRenderer={MyCheckBox}
+                            dataField="name"
+                            enableExpandCollapseIcon
+                            sortable={false}
+                            columnLockMode="left"
+                            enableHierarchicalNestIndent
+                            hierarchicalNestIndent={25}
+                            />
+                        <ReactDataGridColumn
+                            dataField="label"
+                        />
+                        <ReactDataGridColumn
+                            dataField="conflict_type"
+                            headerText="Conflict"
+                            itemRenderer={ConflictCell}
+                            />
+                        <ReactDataGridColumn
+                            dataField="chain"
+                            filterControl="MultiSelectComboBox"
+                            headerText="Chains"
+                            />
+                        <ReactDataGridColumn
+                            dataField="type"
+                            filterControl="MultiSelectComboBox"
+                            filterComboBoxBuildFromGrid
+                            headerText="Type"
+                            />
+                        <ReactDataGridColumn
+                            dataField="modifiedDateString"
+                            filterControl="MultiSelectComboBox"
+                            filterComboBoxBuildFromGrid
+                            headerText="Date"
+                            itemRenderer={DateCell}
+                            />
+                        <ReactDataGridColumn
+                            columnWidthMode="fitToContent"
+                            dataField="employee"
+                            filterControl="TextInput"
+                            filterComboBoxBuildFromGrid
+                            headerText="Employee"
+                            itemRenderer={EmployeeCell}
+                            />
+                        <ReactDataGridColumn
+                            dataField="from"
+                            filterControl="MultiSelectComboBox"
+                            filterComboBoxBuildFromGrid
+                            headerText="From"
+                            itemRenderer={LocationCell}
+                            />
+                        <ReactDataGridColumn
+                            dataField="to"
+                            filterControl="MultiSelectComboBox"
+                            filterComboBoxBuildFromGrid
+                            headerText="To"
+                            itemRenderer={LocationCell}
+                            />
+                        <ReactDataGridColumn
+                            columnWidthMode="fixed"
+                            dataField="description"
+                            filterControl="TextInput"
+                            headerText="Comment"
+                            itemRenderer={CommentCell}
+                            width={320}
+                            wordWrap
+                            />
+                        <ReactDataGridColumn
+                            dataField="createdBy"
+                            filterControl="MultiSelectComboBox"
+                            filterComboBoxBuildFromGrid
+                            
+                            headerText="Created"
+                            />
+                    </ReactDataGridColumnLevel>
+                </ReactDataGrid>
+            </div>
+        );
+    }
+
+
+}
+
+ReactDOM.render(
+    <Example />,
+    document.getElementById('app')
+);
+  
+  </script>
+</body>
+
+</html>
