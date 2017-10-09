@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<!--PLEASE ENSURE YOU READ THE ACCOMPANYING README.TXT FOR DETAILS-->
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>React DataGrid Example</title>
+  <style type="text/css">
+    .flexiciousGrid input.textBox {
+        width: 98%;
+        height: 98%;
+        /* color: #eeeeee; */
+        color: #898989;
+        /* background-color: #3f4554;*/
+        background-color: #F3F3F3;
+        border: none;
+    }
+
+    .multiSelectComboBox .cellRenderer img.insideIcon .inputIcon {
+        content: url('downArrowIcon.png')
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+  <script src="../../lib/reactdatagrid.js"></script>
+  <script src="../../data.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+  <script type="text/babel">
+
+const groupBy=function (dp, prop){
+
+    var buckets = {};
+    var key;
+    var result =[];
+    var _dataProvider= new Object();
+    var _flat= dp;
+    //iterate through the flat list and create a hierarchy
+    for(var i=0;i<_flat.length;i++){
+        var item=_flat[i];
+        key = flexiciousNmsp.UIUtils.resolveExpression(item,prop); //the parent
+        if(!buckets[key]){
+            buckets[key] = [];//the children
+        }
+        buckets[key].push(item); //add to the parents child list
+    }
+    for (key  in buckets){
+        result.push({name:key,label:key,children:buckets[key]}); //create the final structure
+    }
+    return result; //this will refresh the grid...
+}
+const groupedData = groupBy(moves, "createdBy");
+const {
+    ReactDataGrid,
+    ReactDataGridColumnLevel,
+    ReactDataGridColumn,
+    TriStateCheckBox,
+    RowPositionInfo,
+    UIComponent} = flexiciousNmsp;
+
+
+class ColumnHeader extends TriStateCheckBox {
+    clickHandler(event: any) {
+        super.clickHandler(event);
+
+        const grid = this.parent.level.grid;
+
+        grid.getColumnLevel().selectAll(this.getSelected());
+    }
+}
+class MyCheckBox extends TriStateCheckBox {
+        setSelectedState(val) {
+            super.setSelectedState(val);
+            const nestDepth = this.parent.level.getNestDepth();
+            this.setStyleAttribute("display", nestDepth==1?"none":"")
+            if(nestDepth ==1){
+                this.setText("Some new val")
+            }
+        }
+}
+ const CellContainer = ({ children, width, height }: ContainerProps) => (
+  <div  style={{ width, height }}>
+    {children}
+  </div>
+);
+
+ const ConflictCell = ({ cell, row }: any) => {
+  const { conflict_type: type }: Move = row.getData();
+
+  if (!type) {
+    return null;
+  }
+
+  return (
+    <CellContainer height={cell.height} width={cell.width}>
+      <span >type</span>
+    </CellContainer>
+  );
+};
+
+ const DateCell = ({ cell, row }: any) => {
+  const { moveDateString: date }: Move = row.getData();
+
+  if (!date) {
+    return null;
+  }
+
+  return (
+    <CellContainer height={cell.height} width={cell.width}>
+      <p >{moment(date).format('DD/MM/YY')}</p>
+      <span >{moment(date).format('HH:mma')}</span>
+    </CellContainer>
+  );
+};
+
+ const EmployeeCell = ({ cell, row }: any) => {
+  const {
+    employee_firstName: firstName,
+    employee_lastName: lastName,
+    employee_title: role,
+  }: Move = row.getData();
+
+  if (!firstName && !lastName) {
+    return null;
+  }
+
+  return (
+    <CellContainer height={cell.height} width={cell.width}>
+      <p >{firstName} {lastName}</p>
+      <span >{role}</span>
+    </CellContainer>
+  );
+};
+
+ const CommentCell = ({ cell, row }: any) => {
+  const { description }: Move = row.getData();
+
+  // Add non breaking space to prevent column collapse
+  const nonBreakSpace = '\u00A0';
+
+  return (
+    <CellContainer height={cell.height} width={cell.width}>
+      <p >{description || nonBreakSpace}</p>
+    </CellContainer>
+  );
+};
+
+ const LocationCell = ({ cell, row, column }: any) => {
+  const move: Move = row.getData();
+  const type = column.dataField;
+
+  if (!move[`${type}SeatLabel`]) {
+    return null;
+  }
+
+  return (
+    <CellContainer height={cell.height} width={cell.width}>
+      <p >{move[`${type}SeatLabel`]}</p>
+      <span >{move[`${type}SeatFloor`]}</span>
+    </CellContainer>
+  );
+};
+
+class Example extends React.Component {
+
+    constructor(props: Props) {
+        super(props);
+
+        this.styleConfig = {
+            headerVerticalGridLineColor: 0x3F4554,
+            headerVerticalGridLines: false,
+            headerVerticalGridLineThickness: 2,
+
+            headerHorizontalGridLineColor: 0x3F4554,
+            headerHorizontalGridLines: true,
+            headerHorizontalGridLineThickness: 2,
+
+            filterVerticalGridLineColor: 0x3F4554,
+            filterVerticalGridLines: false,
+            filterVerticalGridLineThickness: 2,
+
+            filterHorizontalGridLineColor: 0x3F4554,
+            filterHorizontalGridLines: true,
+            filterHorizontalGridLineThickness: 2,
+
+            footerVerticalGridLines: false,
+            footerHorizontalGridLines: false,
+
+            //alternatingItemColors: [0x404860, 0x4E5569],
+            alternatingItemColors: [0xFFFFFF, 0xFFFFFF],
+
+            //rollOverColor: 0x324855,
+            rollOverColor: 0xE7E7EB,
+
+            headerRollOverColors: [0xFFFFFF, 0xFFFFFF],
+            headerColors: [0xFFFFFF, 0xFFFFFF],
+
+            columnGroupRollOverColors: [0xBDCFEF, 0xD6E7F7],
+            columnGroupColors: [0xBDCFEF, 0xD6E7F7],
+
+            filterColors: [0xF3F3F3, 0xF3F3F3],
+            filterRollOverColors: [0xF3F3F3, 0xF3F3F3],
+
+            editItemColors: [0x3F4554, 0x3F4554],
+
+            fixedColumnFillColors: [0xEFEFEF, 0xEFEFEF],
+
+            activeCellColor: 0xB7DBFF,
+
+            //pagerRollOverColors: [0xBDCFEF, 0xD6E7F7],
+            pagerColors: [0xFFFFFF, 0xFFFFFF],
+
+            footerRollOverColors: [0xFFFFFF, 0xFFFFFF],
+            footerColors: [0xFFFFFF, 0xFFFFFF],
+
+            //rendererRollOverColors: [0xFFFFFF, 0xFFFFFF],
+            rendererColors: [0xFFFFFF, 0xFFFFFF],
+
+            textSelectedColor: 0x000000,
+            // textRollOverColor: 0xFFFFFF,
+            textRollOverColor: 0x000000,
+
+            borderColor: 0x666666,
+
+            selectionColor: [0xFFEFB5, 0xFFDF8C]
+        }
+
+    }
+    
+    componentDidMount(){
+        this.dataGrid.setDataProvider(groupedData);
+
+        this.dataGrid.expandAll();
+    }
+
+    getRowHeight(item, level, type) {
+        if (type == RowPositionInfo.ROW_TYPE_DATA)
+            return level.getNestDepth() == 1 ? 40 : 80;
+        return -1;
+    }
+
+    cellBackgroundColorFunction(cell) {
+        if (!cell.getIsDataCell()) {
+            return null;
+        }
+        if (cell.level.getNestDepth() == 1) {
+            return 0xececec;
+        }
+        return null;
+    }
+
+    
+    getCellBorderFunction(cell) {
+        if(cell.rowInfo.getIsFilterRow() || cell.rowInfo.getIsHeaderRow() || cell.rowInfo.getIsFooterRow()) {
+            if(cell === cell.rowInfo.cells[cell.rowInfo.cells.length - 1].component) {
+                if(cell.rowInfo.hasScrollbarPad) {
+                    cell.propertyBag.style.borderLeft = 'none';
+                    return false;
+                }
+            }
+
+            if( cell.rowInfo.getIsFilterRow() ) {
+                cell.setStyleAttribute('borderBottom', 'none');
+                return false;
+            }
+        }
+
+        if( cell.rowInfo.getIsHeaderRow() ) {
+            cell.setStyleAttribute('fontSize', '18px');
+            cell.setStyleAttribute('borderBottom', '1.5px solid black');
+            return false;
+        }
+
+        if( cell.rowInfo.getIsDataRow() ) {
+            cell.setStyleAttribute('border', 'none');
+            cell.setStyleAttribute('borderBottom', '1.5px solid #e5e5e5');
+            cell.setStyleAttribute('fontSize', '15px');
+            return false;
+        } 
+        return true;
+    }
+
+
+    render() {
+
+
+        return (
+            <div >
+                
+                <ReactDataGrid
+                    dataProvider={moves}
+                    enableActiveCellHighlight={false}
+                    enableDefaultDisclosureIcon={false}
+                    enableDrag
+                    enableDynamicLevels={false}
+                    enableLockedSectionSeparators={false}
+                    horizontalScrollPolicy="auto"
+                    lockedSeperatorThickness={0}
+                    verticalGridLines={false}
+                    enableFilters
+                    enableEdgerDraw={false}
+                    getRowHeightFunction={this.getRowHeight.bind(this)}
+                    preferencePersistenceKey="dynamicGrouping"
+                    ref={(grid) => { this.dataGrid = grid; } }
+                    width="100%"
+                    rowHeight={40} headerRowHeight={60} filterRowHeight={50}
+                    styles={this.styleConfig}
+                    cellBackgroundColorFunction={this.cellBackgroundColorFunction.bind(this)}
+                    >
+                    <ReactDataGridColumnLevel childrenField="children" enableExpandCollapse={false} cellBorderFunction={this.getCellBorderFunction.bind(this)}>
+                        <ReactDataGridColumn
+                            type="checkbox"
+                            itemRenderer={MyCheckBox}
+                            dataField="name"
+                            enableExpandCollapseIcon={false}
+                            sortable={false}
+                            columnLockMode="left"
+                            enableHierarchicalNestIndent
+                            hierarchicalNestIndent={25}
+                            />
+                        <ReactDataGridColumn
+                            dataField="label"
+                        />
+                        <ReactDataGridColumn
+                            dataField="conflict_type"
+                            headerText="Conflict"
+                            itemRenderer={ConflictCell}
+                            />
+                        <ReactDataGridColumn
+                            dataField="chain"
+                            filterControl="MultiSelectComboBox"
+                            headerText="Chains"
+                            />
+                        <ReactDataGridColumn
+                            dataField="type"
+                            filterControl="MultiSelectComboBox"
+                            filterComboBoxBuildFromGrid
+                            headerText="Type"
+                            />
+                        <ReactDataGridColumn
+                            dataField="modifiedDateString"
+                            filterControl="MultiSelectComboBox"
+                            filterComboBoxBuildFromGrid
+                            headerText="Date"
+                            itemRenderer={DateCell}
+                            />
+                        <ReactDataGridColumn
+                            columnWidthMode="fitToContent"
+                            dataField="employee"
+                            filterControl="TextInput"
+                            filterComboBoxBuildFromGrid
+                            headerText="Employee"
+                            itemRenderer={EmployeeCell}
+                            />
+                        <ReactDataGridColumn
+                            dataField="from"
+                            filterControl="MultiSelectComboBox"
+                            filterComboBoxBuildFromGrid
+                            headerText="From"
+                            itemRenderer={LocationCell}
+                            />
+                        <ReactDataGridColumn
+                            dataField="to"
+                            filterControl="MultiSelectComboBox"
+                            filterComboBoxBuildFromGrid
+                            headerText="To"
+                            itemRenderer={LocationCell}
+                            />
+                        <ReactDataGridColumn
+                            columnWidthMode="fixed"
+                            dataField="description"
+                            filterControl="TextInput"
+                            headerText="Comment"
+                            itemRenderer={CommentCell}
+                            width={320}
+                            wordWrap
+                            />
+                        <ReactDataGridColumn
+                            dataField="createdBy"
+                            filterControl="MultiSelectComboBox"
+                            filterComboBoxBuildFromGrid
+                            headerText="Created"
+                            />
+                            <ReactDataGridColumnLevel 
+                                reusePreviousLevelColumns
+                                cellBorderFunction={this.getCellBorderFunction.bind(this)}
+                                />
+                    </ReactDataGridColumnLevel>
+                </ReactDataGrid>
+            </div>
+        );
+    }
+
+
+}
+
+ReactDOM.render(
+    <Example />,
+    document.getElementById('app')
+);
+  
+  </script>
+</body>
+
+</html>
