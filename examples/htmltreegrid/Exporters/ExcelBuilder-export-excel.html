@@ -1,0 +1,81 @@
+
+<!doctype html>
+<html lang="en" >
+<head>
+    <meta charset="utf-8">
+    <title>Simple</title>
+    <!--These are jquery and plugins that we use from jquery-->
+    <script type="text/javascript" src="http://www.htmltreegrid.com/demo/external/js/adapters/jquery/jquery-1.8.2.js"></script>
+    <script type="text/javascript" src="http://www.htmltreegrid.com/demo/external/js/adapters/jquery/jquery-ui-1.9.1.custom.min.js"></script>
+    <script type="text/javascript" src="http://www.htmltreegrid.com/demo/external/js/adapters/jquery/jquery.maskedinput-1.3.js"></script>
+    <script type="text/javascript" src="http://www.htmltreegrid.com/demo/external/js/adapters/jquery/jquery.watermarkinput.js"></script>
+    <script type="text/javascript" src="http://www.htmltreegrid.com/demo/external/js/adapters/jquery/jquery.ui.menu.js"></script>
+    <script type="text/javascript" src="http://www.htmltreegrid.com/demo/external/js/adapters/jquery/jquery.toaster.js"></script>
+    <!--End-->
+    <!--These are specific to htmltreegrid-->
+    <script type="text/javascript" src="http://www.htmltreegrid.com/demo/minified-compiled-jquery.js"></script>
+    <script type="text/javascript" src="http://www.htmltreegrid.com/demo/examples/js/Configuration.js"></script>
+    <script type="text/javascript" src="http://www.htmltreegrid.com/demo/themes.js"></script>
+    <!--End-->
+    
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.5.0/jszip.min.js"></script>
+    <script type="text/javascript" src="js/excel-builder.dist.js"></script>
+    <!-- <script type="text/javascript" src="http://htmltreegrid.com/demo/external/js/thirdparty/jspdf-combined.js"></script> -->
+    <script type="text/javascript" src="js/FileSaver.js"></script>
+
+    <!--Custom Exporter-->
+	<script type="text/javascript" src="ExcelBuilderExporter.js"></script>
+	<!-- <script type="text/javascript" src="PdfExporter.js"></script> -->
+    <!--End-->
+
+
+    <!--css imports-->
+    <link rel="stylesheet" href="http://www.htmltreegrid.com/demo/flexicious/css/flexicious.css"
+        type="text/css" />
+    <link rel="stylesheet" href="http://www.htmltreegrid.com/demo/external/css/adapter/jquery/jquery-ui-1.9.1.custom.min.css"
+        type="text/css" />
+    <!--End-->
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            var grid = new flexiciousNmsp.FlexDataGrid(document.getElementById("gridContainer"),
+                    {
+
+                        configuration: '<grid id="grid" enablePrint="true" enablePreferencePersistence="true" enableExport="true" forcePagerRow="true" pageSize="50" enableFilters="true" enableFooters="true" enablePaging="true">' +
+                                    '			<level>' +
+                                    '				<columns>' +
+                                    '                   <column type="checkbox"/>'+
+                                    '					<column dataField="id" headerText="ID" filterControl="TextInput" footerLabel="Sum: " footerOperation="sum" footerOperationPrecision="2"/>' +
+                                    '					<column dataField="type" headerText="Type" filterControl="TextInput" filterOperation="Contains" />' +
+                                    '				</columns>' +
+                                    '			</level>' +
+                                    '		' +
+                                    '	</grid>',
+                        dataProvider: [
+							{ "id": "5001", "type": "None", "active": true },
+							{ "id": "5002", "type": "Glazed", "active": true },
+							{ "id": "5005", "type": "Sugar", "active": true },
+							{ "id": "5007", "type": "Powdered Sugar", "active": false },
+							{ "id": "5006", "type": "Chocolate with Sprinkles", "active": true },
+							{ "id": "5003", "type": "Chocolate", "active": false },
+							{ "id": "5004", "type": "Maple", "active": true }
+						]
+                    });
+				grid.excelOptions.exporters = exporters = [new flexiciousNmsp.CsvExporter(), new flexiciousNmsp.DocExporter(), 
+				new flexiciousNmsp.ExcelBuilderExporter()
+				];
+				grid.excelOptions.enableLocalFilePersistence=false;
+
+        });
+
+
+
+    </script>
+</head>
+<body>
+    <div id="gridContainer" style="height: 400px; width: 100%;">
+    </div>
+	<div id="popup"></div>
+</body>
+</html>
