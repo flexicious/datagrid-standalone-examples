@@ -66,17 +66,17 @@
     Sheetjs_Exporter.prototype.uploadForEcho = function (body, exportOptions) {
 
         var new_ws = XLSX.utils.aoa_to_sheet([this.columns, ...this.data]);
-        
+
         /* build workbook */
         var new_wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(new_wb, new_ws, 'SheetJS');
 
         /* write file and trigger a download */
-        var wbout = XLSX.write(new_wb, {bookType:'xlsx', bookSST:true, type:'binary'});
-        var fname =  exportOptions.exportFileName + "." + Sheetjs_Exporter.prototype.getExtension();
+        var wbout = XLSX.write(new_wb, { bookType: 'xlsx', bookSST: true, type: 'binary' });
+        var fname = exportOptions.exportFileName + "." + Sheetjs_Exporter.prototype.getExtension();
         try {
-            saveAs(new Blob([this.s2ab(wbout)],{type:"application/octet-stream"}), fname);
-        } catch(e) { if(typeof console != 'undefined') console.log(e, wbout); }
+            saveAs(new Blob([this.s2ab(wbout)], { type: "application/octet-stream" }), fname);
+        } catch (e) { if (typeof console != 'undefined') console.log(e, wbout); }
 
         this.columns = [];
         this.data = [];
@@ -107,11 +107,11 @@
 
     };
 
-    Sheetjs_Exporter.prototype.s2ab = function(s) {
-		var b = new ArrayBuffer(s.length), v = new Uint8Array(b);
-		for (var i=0; i != s.length; ++i) v[i] = s.charCodeAt(i) & 0xFF;
-		return b;
-	}
+    Sheetjs_Exporter.prototype.s2ab = function (s) {
+        var b = new ArrayBuffer(s.length), v = new Uint8Array(b);
+        for (var i = 0; i != s.length; ++i) v[i] = s.charCodeAt(i) & 0xFF;
+        return b;
+    }
 
 
     /**
@@ -121,7 +121,28 @@
      */
     Sheetjs_Exporter.prototype.writeFooter = function (grid, dataProvider) {
 
-        return "";
+        var colIndex = 0;
+        var footerColumns = [];
+
+        if (this.exportOptions.includeFooters) {
+            var str = "";
+            var i = 0;
+            if (!this.reusePreviousLevelColumns) {
+                while (i++ < this.getNestDepth()) {
+                    footerColumns.push('');
+                }
+            }
+
+            for (var i = 0; i < grid.getExportableColumns().length; i++) {
+                var col = grid.getExportableColumns()[i];
+                if (!this.isIncludedInExport(col))
+                    continue;
+                footerColumns.push(this.getSpaces(col) + col.calculateFooterValue(dataProvider));
+                colIndex++;
+            }
+        }
+
+        this.data.push(footerColumns);
 
     };
 
