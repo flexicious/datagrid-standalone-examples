@@ -91,15 +91,14 @@
                 dataProvider: [],
                 configuration: myCompanyNameSpace.SAMPLE_CONFIGS['simplex']
             });
-            grid.setDataProvider(myCompanyNameSpace.FlexiciousMockGenerator.instance().getDeepOrgList());
+            grid.setDataProvider(myCompanyNameSpace.FlexiciousMockGenerator.instance().getOrgList(true));
         };
 		
 		myCompanyNameSpace.onClick = function () {
 			var openItems = grid.getOpenItems() || [];
 			var newOpenItems = [];
 			var i, k, item;
-			grid.setDataProvider(myCompanyNameSpace.FlexiciousMockGenerator.instance().getDeepOrgList());
-			grid.validateNow();
+			grid.setDataProvider(myCompanyNameSpace.FlexiciousMockGenerator.instance().getOrgList(true));
 			for(k=0;k<openItems.length;k++) {
 				for(i=0;i<grid.getDataProvider().length;i++) {
 					item = grid.getDataProvider()[i];
@@ -110,6 +109,7 @@
 				}
 			}
 			grid.getBodyContainer().openItems = newOpenItems;
+			grid.validateNow();
 		};
                 
     </script>
