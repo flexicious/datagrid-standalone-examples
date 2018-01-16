@@ -99,6 +99,7 @@
 			var newOpenItems = [];
 			var i, k, item;
 			grid.setDataProvider(myCompanyNameSpace.FlexiciousMockGenerator.instance().getOrgList(true));
+			grid.getDataProvider()[0].legalName = grid.getDataProvider()[0].legalName + new Date().getTime();
 			for(k=0;k<openItems.length;k++) {
 				for(i=0;i<grid.getDataProvider().length;i++) {
 					item = grid.getDataProvider()[i];
