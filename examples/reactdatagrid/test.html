@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<!--PLEASE ENSURE YOU READ THE ACCOMPANYING README.TXT FOR DETAILS-->
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>React DataGrid Example</title>
+</head>
+
+<body>
+  <div id="app"></div>
+  <script src="../../lib/reactdatagrid.js"></script>
+  <script type="text/babel">
+const { ReactDataGrid, ReactDataGridColumn} = flexiciousNmsp;
+
+const MAIN_NAVIGATION_HEIGHT = 42;
+const SUBBAR_HEIGHT = 65;
+const DATA_GRID_HEADER_HEIGHT = 57;
+
+class Test extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.setGridHeight = this.setGridHeight.bind(this);
+    }
+
+    componentDidMount() {
+        const grid = this.grid;
+        window.addEventListener('resize', this.setGridHeight);
+    }
+
+    setGridHeight() {
+        const heightWithoutSummary =
+            window.innerHeight -
+            (MAIN_NAVIGATION_HEIGHT +
+                SUBBAR_HEIGHT +
+                DATA_GRID_HEADER_HEIGHT);
+
+        this.dataGrid.setHeight(500);
+    };
+
+    sortFunction (
+        firstMove,
+        secondMove,
+        column
+    ) {
+        const first = firstMove.label;
+        const second = secondMove.label;
+
+        if (!first && !second) {
+            return 0;
+        }
+        if (!first) {
+            return 1;
+        }
+        if (!second) {
+            return -1;
+        }
+        if (first > second) {
+            return 1;
+        }
+        if (first < second) {
+            return -1;
+        }
+
+        return 0;
+    }
+
+    render() {
+        return (
+            <div>
+                <h1 className='page-title'>Numeric Sort</h1>
+                    <ReactDataGrid
+                        ref={function(grid) {
+                            this.dataGrid = grid;
+                        }.bind(this)}
+                        width={"100%"}
+                        enableActiveCellHighlight={false}
+                        enableDefaultDisclosureIcon={false}
+                        enableDynamicLevels
+                        enableFilters
+                        enableHeightAutoAdjust
+                        enableMultiColumnSort
+                        headerVerticalGridLineThickness={0}
+                        horizontalScrollPolicy="on"
+                        noDataMessage="No data to display"
+                        showSpinnerOnFilterPageSort={false}
+                        variableRowHeight
+                        dataProvider={[{ label: "Company A", state: "NJ", rank: "1.11" },
+                        { label: "Company A", state: "PA", rank: "11.1" },
+                        { label: "Company A", state: "CT", rank: "-111" },
+                        { label: "Company A", state: "NY", rank: "2.34" },
+                            { label: "Company A", state: "CT", rank: "-111" },
+                            { label: "Company A", state: "NY", rank: "2.34" },
+                            { label: "Company A", state: "CT", rank: "-111" },
+                            { label: "Company A", state: "NY", rank: "2.34" },
+                            { label: "Company A", state: "CT", rank: "-111" },
+                            { label: "Company A", state: "NY", rank: "2.34" },
+                            { label: "Company A", state: "CT", rank: "-111" },
+                            { label: "Company A", state: "NY", rank: "2.34" },
+                            { label: "Company A", state: "CT", rank: "-111" },
+                            { label: "Company A", state: "NY", rank: "2.34" },
+                            { label: "Company A", state: "CT", rank: "-111" },
+                            { label: "Company A", state: "NY", rank: "2.34" },
+                            { label: "Company A", state: "CT", rank: "-111" },
+                            { label: "Company A", state: "NY", rank: "2.34" },
+                            { label: "Company A", state: "CT", rank: "-111" },
+                            { label: "Company A", state: "NY", rank: "2.34" },
+                            { label: "Company A", state: "CT", rank: "-111" },
+                            { label: "Company A", state: "NY", rank: "2.34" },
+                            { label: "Company A", state: "CT", rank: "-111" },
+                            { label: "Company A", state: "NY", rank: "2.34" },
+                            { label: "Company A", state: "CT", rank: "-111" },
+                            { label: "Company A", state: "NY", rank: "2.34" },
+                            { label: "Company A", state: "CT", rank: "-111" },
+                            { label: "Company A", state: "NY", rank: "2.34" },
+                            { label: "Company A", state: "CT", rank: "-111" },
+                            { label: "Company A", state: "NY", rank: "2.34" },
+                            { label: "Company A", state: "CT", rank: "-111" },
+                            { label: "Company A", state: "NY", rank: "2.34" },
+                            { label: "Company A", state: "CT", rank: "-111" },
+                            { label: "Company A", state: "NY", rank: "2.34" },
+                            { label: "Company A", state: "CT", rank: "-111" },
+                            { label: "Company A", state: "NY", rank: "2.34" },
+                            { label: "Company A", state: "CT", rank: "-111" },
+                            { label: "Company A", state: "NY", rank: "2.34" },
+                            { label: "Company A", state: "CT", rank: "-111" },
+                            { label: "Company A", state: "NY", rank: "2.34" },
+                            { label: "Company A", state: "CT", rank: "-111" },
+                            { label: "Company A", state: "NY", rank: "2.34" },
+                            { label: "Company A", state: "CT", rank: "-111" },
+                            { label: "Company A", state: "NY", rank: "2.34" },
+                            { label: "Company A", state: "CT", rank: "-111" },
+                            { label: "Company A", state: "NY", rank: "2.34" },
+                        { label: "Company A", state: "NJ", rank: "22.2" }]}
+                    >
+                        <ReactDataGridColumn dataField="label" sortCompareFunction={this.sortFunction} useSort/>
+                        <ReactDataGridColumn dataField="state" />
+                        <ReactDataGridColumn dataField="rank" sortNumeric />
+
+                    </ReactDataGrid>
+            </div>
+        );
+    }
+}
+
+ReactDOM.render(
+    <Test />,
+    document.getElementById('app')
+);
+    </script>
+</body>
+
+</html>
