@@ -1,0 +1,137 @@
+.base {
+    div {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+
+.popup {
+  width: 300px;
+}
+
+.searchField {
+    height: 50px !important;
+    align-items: center;
+    width: 100%;
+    padding: 0 10px;
+    color: #f4f4f4;
+    font-size: 15px !important;
+    line-height: 18px;
+}
+
+.searchField > input {
+    padding: 0px !important;
+}
+
+.searchIcon {
+    height: 20px !important;
+    width: 20px !important;
+    margin: 5px;
+    color: #878787;
+}
+
+.selectAll {
+    height: 50px;
+    display: inline-flex;
+    align-items: center;
+    width: 100%;
+}
+
+.selectAllLabel {
+    align-items: center;
+    height: 33px;
+    width: inherit;
+    padding-left: 20px;
+    display: inherit;
+    color: rgba(0, 0, 0, 0.87);
+    font-size: 15px;
+    line-height: 18px;
+}
+
+.selectAllSwitch {
+    float: right;
+    right: 5px;
+    width: 34px !important;
+    padding-right: 20px;
+}
+
+.list {
+    overflow: auto;
+}
+
+.muiList {
+    min-height: 150px;
+    max-height: 273px;
+    box-shadow: none !important;
+    margin: 0px !important;
+    min-width: 240px;
+}
+
+.listItem {
+    padding: 8px 14px !important;
+    cursor: default;
+    .only {
+        position: absolute;
+        right: 10px;
+        display: none;
+        color: #4670AE;
+        font-family: "Open Sans";
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 18px;
+        text-transform: uppercase;
+    }
+}
+
+.menuItem:hover {
+    .only {
+        display: inline-block;
+    }
+}
+
+.menuItemCheckbox{
+    color: #4172a8 !important;
+    height: 20px !important;
+    width: 20px !important;
+    margin-right: 10px !important;
+}
+
+.menuItemLabel {
+  color: #000000;
+  opacity: 87;
+  font-family: "Open Sans";
+  font-size: 13px;
+  line-height: 16px;
+  padding: 2px 0;
+}
+
+.footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 8px;
+  
+    button {
+      color: #4172a8;
+      font-size: 14px;
+    //   font-weight: 600;
+      text-transform: uppercase;
+      padding: 4px;
+      height: 36px;
+      width: 73px;
+      cursor: pointer;
+    }
+  
+    button:first-child{
+      margin-right: 8px;
+    }
+  }
+  
+  .okButton:disabled {
+    color:rgba(70, 112, 174, 0.5) !important;
+  }
+  
+//   .okButton {
+//     width: 36px !important;
+//     min-width: 36px !important;
+//   }
